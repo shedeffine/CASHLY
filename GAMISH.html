@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance Quiz Runner</title>
+<style>
+  html,body{margin:0;padding:0;overflow:hidden;background:#000;}
+  canvas{width:100%;height:100vh;display:block;}
+</style>
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
+</head>
+<body>
+<canvas id="renderCanvas"></canvas>
+<script>
+// ======== FINANCIAL QUESTIONS =========
+const questions = [
+  {question:"What is the full form of IPO?", correct:"Initial Public Offering", wrong:"Immediate Purchase Option"},
+  {question:"Which is a type of mutual fund?", correct:"Equity Fund", wrong:"Fixed Deposit"},
+  {question:"What is a stock dividend?", correct:"Payment in shares", wrong:"Income tax"},
+  {question:"What does CAGR stand for?", correct:"Compound Annual Growth Rate", wrong:"Current Annual Government Rate"},
+  {question:"What is a credit score?", correct:"Measure of creditworthiness", wrong:"Bank interest rate"},
+  {question:"What is a bond?", correct:"Debt security", wrong:"Company profit share"},
+  {question:"What is a budget?", correct:"Spending plan", wrong:"Bank loan"},
+  {question:"What is diversification?", correct:"Spreading investments", wrong:"High risk investing"},
+  {question:"What is inflation?", correct:"Increase in prices", wrong:"Decrease in salaries"},
+  {question:"What is a bull market?", correct:"Market rising", wrong:"Market falling"}
+];
+while(questions.length<50) questions.push(questions[questions.length%10]);
+
+// ======== SCENE =========
+const canvas = document.getElementById("renderCanvas");
+const engine = new BABYLON.Engine(canvas,true);
+const scene  = new BABYLON.Scene(engine);
+scene.clearColor = new BABYLON.Color3(0.02,0.02,0.08);
+
+const camera = new BABYLON.UniversalCamera("cam",new BABYLON.Vector3(0,7,-25),scene);
+camera.setTarget(new BABYLON.Vector3(0,4,15));
+new BABYLON.HemisphericLight("light",new BABYLON.Vector3(0,1,0),scene);
+
+// ======== SCORE UI =========
+const ui = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("ui");
+const scoreText = new BABYLON.GUI.TextBlock();
+scoreText.text = "Score: 0";
+scoreText.color = "white";
+scoreText.fontSize = 48;
+scoreText.top = "20px";
+scoreText.left = "20px";
+scoreText.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+scoreText.verticalAlignment   = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+ui.addControl(scoreText);
+let score=0;
+
+// ======== PLAYER =========
+let player = BABYLON.MeshBuilder.CreateCapsule("player",{height:3,radius:1},scene);
+player.position.y = 1.5;
+player.material = new BABYLON.StandardMaterial("pmat",scene);
+player.material.diffuseColor = new BABYLON.Color3(1,1,0); // bright yellow
+let lane = 0;
+const laneWidth = 6;
+window.addEventListener("keydown",e=>{
+  if(e.key==="ArrowLeft" && lane>-1) lane--;
+  if(e.key==="ArrowRight" && lane<1) lane++;
+});
+
+// ======== TRACK =========
+function makeTrack(z){
+  const g = BABYLON.MeshBuilder.CreateGround("g",{width:24,height:60},scene);
+  g.position.z = z;
+  const m = new BABYLON.StandardMaterial("m",scene);
+  m.diffuseColor = new BABYLON.Color3(0.15,0.15,0.4); // deep blue
+  g.material = m;
+  return g;
+}
+const tracks = [makeTrack(0),makeTrack(60)];
+
+// ======== DOORS & QUESTIONS =========
+let activeDoors=[];
+let qIndex=0;
+let qPlane;
+
+function spawnDoors(){
+  const q = questions[qIndex++ % questions.length];
+  const correctLeft = Math.random()<0.5;
+
+  if(qPlane) qPlane.dispose();
+  qPlane = BABYLON.MeshBuilder.CreatePlane("questionPlane",{width:20,height:5},scene);
+  qPlane.position.set(0,10,40);
+  qPlane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+  const qTex = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(qPlane);
+  const qLabel = new BABYLON.GUI.TextBlock();
+  qLabel.text = q.question;
+  qLabel.color = "yellow";
+  qLabel.fontSize = 96;
+  qLabel.textWrapping = true;
+  qTex.addControl(qLabel);
+
+  function makeDoor(x,isCorrect,optionText,color){
