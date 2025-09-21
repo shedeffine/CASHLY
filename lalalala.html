@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Decision Challenge</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 20px; color: white; overflow-x: hidden;
+        }
+        .container { width: 100%; max-width: 1000px; background: rgba(0,0,0,0.7); border-radius: 20px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); text-align: center; }
+        h1 { color: #fdbb2d; margin-bottom: 20px; font-size: 2.8rem; text-shadow: 3px 3px 6px rgba(0,0,0,0.5); letter-spacing: 1.5px; }
+        .game-info { display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 1.3rem; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 15px; }
+        #game-area { position: relative; width: 100%; height: 500px; margin: 0 auto; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.6); border: 4px solid #fdbb2d; background: linear-gradient(to bottom, #2c3e50, #4a6491); }
+        #road { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 300px; height: 100%; background: #7f8c8d; border-top: 4px dashed #ecf0f1; }
+        .gate { position: absolute; width: 400px; height: 180px; display: flex; justify-content: space-between; left: 50%; transform: translateX(-50%); transition: all 0.3s; }
+        .door { width: 180px; height: 180px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.2rem; color: white; box-shadow: 0 0 15px rgba(0,0,0,0.4); padding: 10px; text-align: center; cursor: pointer; transition: all 0.3s; background: linear-gradient(to bottom, #3498db, #2980b9); border: 3px solid #2c3e50; }
+        .door:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.6); background: linear-gradient(to bottom, #3498db, #20638f); }
+        .door-question { font-size: 0.9rem; margin-bottom: 10px; font-weight: bold; height: 60px; display: flex; align-items: center; justify-content: center; }
+        .door-icon { font-size: 2rem; margin-bottom: 10px; }
+        #character { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 60px; height: 90px; z-index: 10; }
+        .character-body { position: absolute; width: 40px; height: 60px; background: #2196F3; bottom: 0; left: 10px; border-radius: 10px 10px 0 0; animation: bodyBounce 0.5s infinite alternate; }
+        .character-head { position: absolute; width: 30px; height: 30px; background: #FFD54F; border-radius: 50%; bottom: 60px; left: 15px; animation: headTilt 2s infinite alternate; }
+        .character-leg { position: absolute; width: 12px; height: 30px; background: #1976D2; bottom: -30px; border-radius: 0 0 5px 5px; }
+        #left-leg { left: 14px; animation: walkLeft 0.5s infinite alternate; }
+        #right-leg { right: 14px; animation: walkRight 0.5s infinite alternate; }
+        @keyframes bodyBounce { from { transform: translateY(0px); } to { transform: translateY(-3px); } }
+        @keyframes headTilt { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+        @keyframes walkLeft { 0% { transform: rotate(0deg); height: 30px; } 50% { transform: rotate(15deg); height: 35px; } 100% { transform: rotate(-10deg); height: 40px; } }
+        @keyframes walkRight { 0% { transform: rotate(0deg); height: 40px; } 50% { transform: rotate(-15deg); height: 35px; } 100% { transform: rotate(10deg); height: 30px; } }
+        .controls { margin: 25px 0; display: flex; justify-content: center; gap: 25px; }
+        button { padding: 15px 30px; font-size: 1.2rem; background: #fdbb2d; color: #1a2a6c; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        button:hover { background: #ffcc44; transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
+        #timer { height: 10px; background: #ddd; border-radius: 5px; margin: 15px auto; width: 400px; overflow: hidden; }
+        #time-left { height: 100%; background: #4CAF50; width: 100%; transition: width 1s linear; }
+        .stats { display: flex; justify-content: space-around; margin-top: 20px; }
+        .stat-item { background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; }
+        .stat-value { font-size: 1.8rem; font-weight: bold; color: #fdbb2d; }
+        .stat-label { font-size: 1rem; color: #ccc; }
+        .instructions { background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; margin-top: 25px; text-align: left; }
+        .instructions h2 { color: #fdbb2d; margin-bottom: 15px; font-size: 1.5rem; }
+        .instructions ul { padding-left: 25px; }
+        .instructions li { margin-bottom: 10px; line-height: 1.5; }
+        .game-over { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); padding: 30px; border-radius: 15px; text-align: center; z-index: 90; display: none; }
+        .game-over h2 { color: #FF5252; font-size: 3rem; margin-bottom: 20px; }
+        .game-over p { font-size: 1.5rem; margin-bottom: 10px; }
+        .highlight { box-shadow: 0 0 20px 5px yellow; transform: scale(1.05); }
+        .correct { background: linear-gradient(to bottom, #4CAF50, #2E7D32) !important; }
+        .incorrect { background: linear-gradient(to bottom, #F44336, #D32F2F) !important; }
+        .celebration { position: absolute; font-size: 3rem; color: gold; pointer-events: none; z-index: 50; opacity: 0; animation: celebrate 2s ease-out; }
+        @keyframes celebrate { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(2.5); } }
+        .flash { animation: flash 0.5s; }
+        @keyframes flash { 0% { background-color: transparent; } 50% { background-color: rgba(255, 215, 0, 0.3); } 100% { background-color: transparent; } }
+        .question-display { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; text-align: center; width: 80%; z-index: 5; font-size: 1.2rem; border: 2px solid #fdbb2d; }
+        .difficulty-indicator { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); padding: 5px 15px; border-radius: 10px; text-align: center; z-index: 5; font-size: 1rem; border: 1px solid #fdbb2d; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1><i class="fas fa-brain"></i> Financial Decision Challenge</h1>
+    <div class="game-info">
+        <div id="score"><i class="fas fa-dollar-sign"></i> Score: <span>0</span></div>
+        <div id="lives"><i class="fas fa-heart"></i> Lives: <span>3</span></div>
+        <div id="level"><i class="fas fa-chart-line"></i> Level: <span>1</span></div>
+    </div>
+    <div id="game-area">
+        <div id="road"></div>
+        <div class="question-display"><span id="current-question"></span></div>
+        <div class="difficulty-indicator">Difficulty: <span id="difficulty"></span></div>
+        <div class="gate" id="gate" style="bottom: 350px;">
+            <div id="left-door" class="door"><div class="door-icon"><i class="fas fa-door-open"></i></div><div class="door-question"></div></div>
+            <div id="right-door" class="door"><div class="door-icon"><i class="fas fa-door-open"></i></div><div class="door-question"></div></div>
+        </div>
+        <div id="character">
+            <div class="character-head"></div>
+            <div class="character-body"></div>
+            <div id="left-leg" class="character-leg"></div>
+            <div id="right-leg" class="character-leg"></div>
+        </div>
+        <div class="game-over">
+            <h2><i class="fas fa-skull"></i> GAME OVER</h2>
+            <p>Final Score: <span id="final-score"></span></p>
+            <p>Level Reached: <span id="final-level"></span></p>
+            <button id="play-again-btn"><i class="fas fa-redo"></i> Play Again</button>
+        </div>
+    </div>
+    <div id="timer"><div id="time-left"></div></div>
+    <div class="controls">
+        <button id="left-btn"><i class="fas fa-arrow-left"></i> Left Door</button>
+        <button id="right-btn">Right Door <i class="fas fa-arrow-right"></i></button>
+        <button id="start-btn"><i class="fas fa-play"></i> Start Game</button>
+    </div>
+    <div class="stats">
+        <div class="stat-item"><div class="stat-value" id="total-score">0</div><div class="stat-label">Total Score</div></div>
+        <div class="stat-item"><div class="stat-value" id="correct-answers">0</div><div class="stat-label">Correct Answers</div></div>
+        <div class="stat-item"><div class="stat-value" id="gates-passed">0</div><div class="stat-label">Gates Passed</div></div>
+    </div>
+    <div class="instructions">
+        <h2><i class="fas fa-info-circle"></i> How to Play</h2>
+        <ul>
+            <li>Press "Start Game" to begin</li>
+            <li>Your character automatically moves forward through gates</li>
+            <li>Read the financial question carefully</li>
+            <li>Choose the correct answer before time runs out</li>
+            <li>Both doors look identical - focus on the content, not the color</li>
+            <li>Correct choices earn you points</li>
+            <li>Wrong choices or timeouts cost you a life</li>
+            <li>You have 3 lives - game ends when you run out</li>
+            <li>Use the buttons or keyboard arrows (← →) to choose doors</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+const scoreElement = document.getElementById('score').querySelector('span');
+const livesElement = document.getElementById('lives').querySelector('span');
+const levelElement = document.getElementById('level').querySelector('span');
+const leftDoor = document.getElementById('left-door');
+const rightDoor = document.getElementById('right-door');
+const leftBtn = document.getElementById('left-btn');
+const rightBtn = document.getElementById('right-btn');
+const startBtn = document.getElementById('start-btn');
+const character = document.getElementById('character');
+const timeLeft = document.getElementById('time-left');
+const totalScoreElement = document.getElementById('total-score');
+const correctAnswersElement = document.getElementById('correct-answers');
+const gatesPassedElement = document.getElementById('gates-passed');
+const gameOverScreen = document.querySelector('.game-over');
+const finalScoreElement = document.getElementById('final-score');
+const finalLevelElement = document.getElementById('final-level');
+const playAgainBtn = document.getElementById('play-again-btn');
+const currentQuestionElement = document.getElementById('current-question');
+const gate = document.getElementById('gate');
+const difficultyElement = document.getElementById('difficulty');
+
+let score = 0, lives = 3, level = 1, gameOver = false, gameStarted = false;
+let totalScore = 0, correctAnswers = 0, gatesPassed = 0;
+let currentQuestion = null, timerInterval = null, timeLimit = 8;
+let currentCorrectDoor = null, gameInterval = null;
+let characterPosition = 30, gatePosition = 350, gateSpeed = 2, gateActive = false;
+
+// Questions
+const financialQuestions = [
+    { question:"Which investment strategy is most appropriate for long-term wealth building?", leftOption:"Diversified index funds", rightOption:"Individual stock picking", correctDoor:"left", difficulty:"Advanced" },
+    { question:"What is the primary benefit of a Roth IRA compared to a traditional IRA?", leftOption:"Tax-free withdrawals in retirement", rightOption:"Higher contribution limits", correctDoor:"left", difficulty:"Advanced" },
+    { question:"Which debt repayment strategy is mathematically optimal?", leftOption:"Avalanche method (highest interest first)", rightOption:"Snowball method (smallest balance first)", correctDoor:"left", difficulty:"Intermediate" },
+    { question:"What is the main advantage of dollar-cost averaging?", leftOption:"Reduces impact of market volatility", rightOption:"Guarantees higher returns", correctDoor:"left", difficulty:"Intermediate" },
+    { question:"Which factor has the greatest impact on investment returns over time?", leftOption:"Compound interest", rightOption:"Market timing", correctDoor:"left", difficulty:"Advanced" },
+];
+
+// Update positions
+function updatePositions() {
+    character.style.bottom = characterPosition+'px';
+    gate.style.bottom = gatePosition+'px';
+}
+
+// Load new question with randomized correct door
+function loadNewQuestion() {
+    const randomIndex = Math.floor(Math.random()*financialQuestions.length);
+    currentQuestion = { ...financialQuestions[randomIndex] };
+    
+    // Randomize correct door
+    if (Math.random() < 0.5) currentCorrectDoor='left';
+    else currentCorrectDoor='right';
+    
+    if (currentCorrectDoor==='left') {
+        leftDoor.querySelector('.door-question').textContent=currentQuestion.leftOption;
+        rightDoor.querySelector('.door-question').textContent=currentQuestion.rightOption;
+    } else {
+        leftDoor.querySelector('.door-question').textContent=currentQuestion.rightOption;
+        rightDoor.querySelector('.door-question').textContent=currentQuestion.leftOption;
+    }
+    
+    currentQuestionElement.textContent = currentQuestion.question;
+    difficultyElement.textContent = currentQuestion.difficulty;
+}
+
+// Timer
+function startTimer() {
+    let timeRemaining = timeLimit;
+    timeLeft.style.width = '100%';
+    timeLeft.style.background = '#4CAF50';
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(()=>{
+        timeRemaining -= 0.1;
+        if (timeRemaining <=0) {
+            clearInterval(timerInterval);
+            handleTimeout();
+        }
+        timeLeft.style.width = `${(timeRemaining/timeLimit)*100}%`;
+    },100);
+}
+
+// Handle timeout
+function handleTimeout() {
+    flashDoor(currentCorrectDoor==='left'?leftDoor:rightDoor);
+    loseLife();
+    resetGate();
+}
+
+// Flash door on wrong / timeout
+function flashDoor(door){
+    door.classList.add('flash');
+    setTimeout(()=>door.classList.remove('flash'),500);
+}
+
+// Lose life
+function loseLife(){
+    lives--;
+    livesElement.textContent = lives;
+    if (lives<=0) endGame();
+}
+
+// Handle door choice
+function chooseDoor(choice) {
+    if (gameOver || !gateActive) return;
+    let correct = (choice===currentCorrectDoor);
+    if (correct) {
+        score += 10;
+        scoreElement.textContent = score;
+        totalScore +=10;
+        correctAnswers++;
+        gatesPassed++;
+        totalScoreElement.textContent = totalScore;
+        correctAnswersElement.textContent = correctAnswers;
+        gatesPassedElement.textContent = gatesPassed;
+        (choice==='left'?leftDoor:rightDoor).classList.add('correct');
+        setTimeout(()=>{ (choice==='left'?leftDoor:rightDoor).classList.remove('correct'); resetGate(); },500);
+    } else {
+        loseLife();
+        (choice==='left'?leftDoor:rightDoor).classList.add('incorrect');
+        setTimeout(()=>{ (choice==='left'?leftDoor:rightDoor).classList.remove('incorrect'); resetGate(); },500);
+    }
+}
+
+// Reset gate
+function resetGate(){
+    gatePosition = 350;
+    loadNewQuestion();
+    gateActive=true;
+    startTimer();
+}
+
+// Game loop
+function gameLoop(){
+    if (gameOver) return;
+    gatePosition -= gateSpeed;
+    updatePositions();
+    if (gatePosition <= characterPosition+30 && gateActive){
+        // Character reached gate without choosing
+        handleTimeout();
+        gateActive=false;
+    }
+    gameInterval = requestAnimationFrame(gameLoop);
+}
+
+// Start game
+function startGame(){
+    gameStarted=true;
+    gameOver=false;
+    score=0; lives=3; level=1;
+    totalScore=0; correctAnswers=0; gatesPassed=0;
+    scoreElement.textContent=score; livesElement.textContent=lives; levelElement.textContent=level;
+    totalScoreElement.textContent=totalScore; correctAnswersElement.textContent=correctAnswers; gatesPassedElement.textContent=gatesPassed;
+    gameOverScreen.style.display='none';
+    gateActive=true;
+    loadNewQuestion();
+    resetGate();
+    gameLoop();
+}
+
+// End game
+function endGame(){
+    gameOver=true;
+    cancelAnimationFrame(gameInterval);
+    clearInterval(timerInterval);
+    finalScoreElement.textContent=score;
+    finalLevelElement.textContent=level;
+    gameOverScreen.style.display='block';
+}
+
+// Event listeners
+leftBtn.addEventListener('click', ()=>chooseDoor('left'));
+rightBtn.addEventListener('click', ()=>chooseDoor('right'));
+startBtn.addEventListener('click', startGame);
+playAgainBtn.addEventListener('click', startGame);
+document.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowLeft') chooseDoor('left');
+    if(e.key==='ArrowRight') chooseDoor('right');
+});
+</script>
+</body>
+</html>
