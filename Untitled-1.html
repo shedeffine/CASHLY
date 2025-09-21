@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Transaction Scam Detector</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin: 25px 0 15px;
+            font-size: 1.8rem;
+        }
+        
+        p {
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .instructions {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .message {
+            background-color: #f8f9fa;
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+        
+        .message:hover {
+            transform: translateY(-3px);
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .message-content {
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+        
+        .scam-indicator {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        input[type="checkbox"] {
+            transform: scale(1.5);
+            margin-right: 15px;
+            accent-color: #3498db;
+        }
+        
+        label {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 30px auto;
+            display: block;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .results {
+            display: none;
+            background-color: #e8f4fc;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .correct {
+            color: #27ae60;
+        }
+        
+        .incorrect {
+            color: #e74c3c;
+        }
+        
+        .feedback {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .feedback.correct {
+            background-color: #e8f5e9;
+            border-left: 5px solid #27ae60;
+        }
+        
+        .feedback.incorrect {
+            background-color: #ffebee;
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .improvement-tips {
+            background-color: #fff8e1;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+            border-left: 5px solid #f1c40f;
+        }
+        
+        .tip {
+            margin: 15px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .tip-number {
+            background-color: #f1c40f;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .message-content {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Money Transaction Scam Detector</h1>
+        
+        <div class="instructions">
+            <h2>How to Play</h2>
+            <p>Below you'll find various SMS, email, and WhatsApp messages. Some are legitimate, while others are scams.</p>
+            <p><strong>Your task:</strong> Check the box for each message you believe is a scam. When you're done, click "Evaluate Answers" to see how well you did.</p>
+            <p>You'll receive feedback on any mistakes and learn how to improve your scam detection skills.</p>
+        </div>
+        
+        <h2>Are these messages scams?</h2>
+        
+        <div id="messages"></div>
+        
+        <button onclick="evaluateAnswers()">Evaluate Answers</button>
+        
+        <div class="results" id="results">
+            <h2>Your Results</h2>
+            <div class="score" id="score">Accuracy: 0%</div>
+            
+            <div id="feedback"></div>
+            
+            <div class="improvement-tips">
+                <h2>How to Improve Your Scam Detection Skills</h2>
+                
+                <div class="tip">
+                    <div class="tip-number">1</div>
+                    <div class="tip-content">
+                        <p><strong>Verify sender information:</strong> Legitimate organizations use official numbers/addresses. Scammers often use similar-looking addresses with slight misspellings.</p>
+                    </div>
+                </div>
+                
+                <div class="tip">
+                    <div class="tip-number">2</div>
+                    <div class="tip-content">
+                        <p><strong>Look for urgency and pressure:</strong> Scammers often create a false sense of urgency to make you act without thinking.</p>
+                    </div>
+                </div>
+                
+                <div class="tip">
+                    <div class="tip-number">3</div>
+                    <div class="tip-content">
+                        <p><strong>Check for poor grammar and spelling:</strong> While some scams are well-written, many contain grammatical errors and awkward phrasing.</p>
+                    </div>
+                </div>
+                
+                <div class="tip">
+                    <div class="tip-number">4</div>
+                    <div class="tip-content">
+                        <p><strong>Be wary of requests for personal information:</strong> Legitimate organizations won't ask for passwords, PINs, or verification codes via message.</p>
+                    </div>
+                </div>
+                
+                <div class="tip">
+                    <div class="tip-number">5</div>
+                    <div class="tip-content">
+                        <p><strong>Don't click on suspicious links:</strong> Hover over links to see the actual URL before clicking. When in doubt, go directly to the official website.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Indian customer base questions
+        const questionBank = [
+            // ...existing questions...
+            {
+                type: 'SMS',
+                sender: 'AX-SBICARD',
+                text: 'Your SBI credit card is blocked. Click here to unblock: http://sbicard-unblock.in',
+                scam: true,
+                explanation: 'SBI never asks to unblock cards via links in SMS. The URL is not official.'
+            },
+            {
+                type: 'Email',
+                sender: 'info@paytm.com',
+                text: 'Your Paytm KYC is expiring soon. Please update via the official app.',
+                scam: false,
+                explanation: 'Paytm sends KYC reminders, but always asks to update via the app, not links.'
+            },
+            {
+                type: 'WhatsApp',
+                sender: '+91 99876 54321',
+                text: 'This is your electricity provider. Pay your bill now to avoid disconnection. UPI: powerbill@okaxis',
+                scam: true,
+                explanation: 'Utility companies do not request payment via WhatsApp or UPI IDs.'
+            },
+            {
+                type: 'SMS',
+                sender: 'VK-JIO',
+                text: 'Jio: Your recharge of ₹399 is successful. Thank you for choosing Jio.',
+                scam: false,
+                explanation: 'This is a legitimate recharge confirmation from Jio.'
+            },
+            {
+                type: 'Email',
+                sender: 'help@airindia.in',
+                text: 'Your Air India flight AI123 is rescheduled. Please check your booking for details.',
+                scam: false,
+                explanation: 'Air India sends flight updates from their official email.'
+            },
+            {
+                type: 'SMS',
+                sender: 'AX-EPFO',
+                text: 'EPFO: Your PF withdrawal request is approved. Amount will be credited soon.',
+                scam: false,
+                explanation: 'This is a legitimate EPFO notification.'
+            },
+            {
+                type: 'WhatsApp',
+                sender: '+91 90000 12345',
+                text: 'I am from your bank. Please share your account number for verification.',
+                scam: true,
+                explanation: 'Banks never ask for account details over WhatsApp.'
+            },
+            {
+                type: 'Email',
+                sender: 'support@swiggy.in',
+                text: 'Your Swiggy order #123456 has been delivered. Rate your experience.',
+                scam: false,
+                explanation: 'This is a legitimate Swiggy delivery notification.'
+            },
+            {
+                type: 'SMS',
+                sender: 'AX-IRCTC',
+                text: 'IRCTC: Your train ticket is cancelled. Refund will be processed to your account.',
+                scam: false,
+                explanation: 'IRCTC sends cancellation and refund notifications via SMS.'
+            },
+            {
+                type: 'WhatsApp',
+                sender: '+91 98765 43211',
+                text: 'Hi, I am your cousin. Can you send ₹2000 to my UPI? I am in an emergency.',
+                scam: true,
+                explanation: 'Scammers often impersonate relatives and ask for money via UPI.'
+            }
+        ];
+
+        // Randomize questions and scam/legitimate order
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Pick 5 random questions each time, fully randomized
+        function getRandomQuestions() {
+            return shuffle([...questionBank]).slice(0, 5);
+        }
+
+
+        // Render questions
+        function renderQuestions() {
+            const container = document.getElementById('messages');
+            container.innerHTML = '';
+            questions.forEach((q, idx) => {
+                container.innerHTML += `
+                <div class="message" id="message${idx+1}">
+                    <div class="message-header">
+                        <span>${q.type} • ${q.sender}</span>
+                        <span class="scam-indicator" style="display:none;">${q.scam ? 'SCAM' : 'LEGITIMATE'}</span>
+                    </div>
+                    <div class="message-content">
+                        <p>${q.text}</p>
+                    </div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="scam${idx+1}" name="scam${idx+1}">
+                        <label for="scam${idx+1}">This is a scam</label>
+                    </div>
+                </div>
+                `;
+            });
+        }
+
+        // Re-randomize questions on each page load
+        window.onload = function() {
+            window.questions = getRandomQuestions();
+            renderQuestions();
+        };
+
+        // Show scam-indicator only after submission
+        function showScamIndicators() {
+            const indicators = document.querySelectorAll('.scam-indicator');
+            indicators.forEach(ind => ind.style.display = 'inline');
+        }
+
+        function evaluateAnswers() {
+            let correctCount = 0;
+            let totalQuestions = questions.length;
+            let feedbackHTML = "";
+            let wrongScam = 0, wrongLegit = 0;
+
+            for (let i = 0; i < totalQuestions; i++) {
+                const userAnswer = document.getElementById(`scam${i+1}`).checked;
+                const isCorrect = userAnswer === questions[i].scam;
+                if (isCorrect) {
+                    correctCount++;
+                    feedbackHTML += `
+                        <div class="feedback correct">
+                            <p><strong>Correct!</strong> Message ${i+1}: ${questions[i].explanation}</p>
+                        </div>
+                    `;
+                } else {
+                    const scamStatus = questions[i].scam ? "a scam" : "legitimate";
+                    feedbackHTML += `
+                        <div class="feedback incorrect">
+                            <p><strong>Incorrect!</strong> Message ${i+1} is actually ${scamStatus}. ${questions[i].explanation}</p>
+                        </div>
+                    `;
+                    if (questions[i].scam && !userAnswer) wrongScam++;
+                    if (!questions[i].scam && userAnswer) wrongLegit++;
+                }
+            }
+
+            const accuracy = Math.round((correctCount / totalQuestions) * 100);
+            let personalFeedback = "";
+            if (accuracy === 100) {
+                personalFeedback = "<div class='feedback correct'><strong>Outstanding!</strong> You detected every scam and legitimate message perfectly. Stay vigilant! 🇮🇳</div>";
+            } else if (accuracy >= 80) {
+                personalFeedback = "<div class='feedback correct'><strong>Great job!</strong> You have a strong sense for scams. Review the mistakes below to become even sharper.</div>";
+            } else if (accuracy >= 60) {
+                personalFeedback = "<div class='feedback'><strong>Good effort!</strong> You're on the right track. Pay extra attention to details in scam messages and official notifications.</div>";
+            } else {
+                personalFeedback = "<div class='feedback incorrect'><strong>Needs improvement.</strong> Many scam messages can look convincing. Focus on checking sender details, links, and requests for sensitive info.</div>";
+            }
+
+            if (wrongScam > 0) {
+                personalFeedback += `<div class='feedback incorrect'>You missed ${wrongScam} scam message${wrongScam > 1 ? 's' : ''}. Scammers often use urgency and fake links. Always verify before acting.</div>`;
+            }
+            if (wrongLegit > 0) {
+                personalFeedback += `<div class='feedback incorrect'>You marked ${wrongLegit} legitimate message${wrongLegit > 1 ? 's' : ''} as scam. Official notifications from trusted sources are usually safe if they don't ask for sensitive info.</div>`;
+            }
+
+            // Personalize improvement tips
+            let tipsHTML = "<h2>How to Improve Your Scam Detection Skills</h2>";
+            tipsHTML += `<div class='tip'><div class='tip-number'>1</div><div class='tip-content'><p><strong>Verify sender information:</strong> Legitimate organizations use official numbers/addresses. Scammers often use similar-looking addresses with slight misspellings.</p></div></div>`;
+            if (wrongScam > 0) {
+                tipsHTML += `<div class='tip'><div class='tip-number'>2</div><div class='tip-content'><p><strong>Look for urgency and pressure:</strong> You missed ${wrongScam} scam message${wrongScam > 1 ? 's' : ''}. Scammers often create a false sense of urgency to make you act without thinking. Pause and verify before responding.</p></div></div>`;
+            } else {
+                tipsHTML += `<div class='tip'><div class='tip-number'>2</div><div class='tip-content'><p><strong>Look for urgency and pressure:</strong> Scammers often create a false sense of urgency to make you act without thinking.</p></div></div>`;
+            }
+            tipsHTML += `<div class='tip'><div class='tip-number'>3</div><div class='tip-content'><p><strong>Check for poor grammar and spelling:</strong> While some scams are well-written, many contain grammatical errors and awkward phrasing.</p></div></div>`;
+            if (wrongLegit > 0) {
+                tipsHTML += `<div class='tip'><div class='tip-number'>4</div><div class='tip-content'><p><strong>Be wary of requests for personal information:</strong> You marked ${wrongLegit} legitimate message${wrongLegit > 1 ? 's' : ''} as scam. Legitimate organizations won't ask for passwords, PINs, or verification codes via message. If a message doesn't ask for sensitive info, it's likely safe.</p></div></div>`;
+            } else {
+                tipsHTML += `<div class='tip'><div class='tip-number'>4</div><div class='tip-content'><p><strong>Be wary of requests for personal information:</strong> Legitimate organizations won't ask for passwords, PINs, or verification codes via message.</p></div></div>`;
+            }
+            tipsHTML += `<div class='tip'><div class='tip-number'>5</div><div class='tip-content'><p><strong>Don't click on suspicious links:</strong> Hover over links to see the actual URL before clicking. When in doubt, go directly to the official website.</p></div></div>`;
+
+            document.getElementById('score').textContent = `Accuracy: ${accuracy}%`;
+            document.getElementById('score').className = `score ${accuracy >= 80 ? 'correct' : accuracy >= 60 ? '' : 'incorrect'}`;
+            document.getElementById('feedback').innerHTML = personalFeedback + feedbackHTML;
+            document.getElementById('results').style.display = 'block';
+            document.querySelector('.improvement-tips').innerHTML = tipsHTML;
+            showScamIndicators();
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

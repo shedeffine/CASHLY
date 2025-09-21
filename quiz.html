@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashly - Financial Literacy Game</title>
+    <style>
+        :root {
+            --primary: #4CAF50; /* Money green */
+            --secondary: #388E3C; /* Darker green */
+            --accent: #ff6b6b;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --success: #1dd1a1;
+            --warning: #feca57;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex; /* Use flex layout */
+            flex-direction: column; /* Align items vertically */
+            align-items: center; /* Center items horizontally */
+            gap: 20px; /* Add spacing between elements */
+        }
+        
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(to right, #fff, #ffeb3b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .slogan {
+            font-size: 18px;
+            font-style: italic;
+            font-weight: bold;
+            color: var(--light);
+            margin-top: 5px;
+        }
+        
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .language-selector select {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: none;
+            background-color: white;
+            color: var(--dark);
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .questions-panel {
+            flex: 1; /* Allow the quiz box to take up space */
+            margin-right: 20px; /* Add spacing between quiz and game */
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            align-self: center; /* Align with game box */
+            margin: 0 auto; /* Center horizontally */
+            width: 100%; /* Full width */
+        }
+        
+        .question-container {
+            margin-bottom: 20px;
+        }
+        
+        .question-text {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option {
+            padding: 12px 15px;
+            background-color: #f1f2f6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option:hover {
+            background-color: #dfe4ea;
+            transform: translateX(5px);
+        }
+        
+        .option.correct {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .option.incorrect {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .score {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .next-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .next-btn:disabled {
+            background: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .feedback-container {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #ffeaa7;
+            color: var(--dark);
+            display: none;
+        }
+        
+        .category-tags {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .category-tag {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .saving {
+            background-color: #74b9ff;
+            color: white;
+        }
+        
+        .borrowing {
+            background-color: #ff7675;
+            color: white;
+        }
+        
+        .investing {
+            background-color: #55efc4;
+            color: var(--dark);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column; /* Stack vertically on small screens */
+            }
+            
+            .questions-panel {
+                margin-left: 0; /* Remove left margin on small screens */
+                margin-top: 20px; /* Add top margin for spacing */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="logo.png" alt="Cashly Logo" style="width: 150px; height: auto;">
+            </div>
+            <p class="slogan" style="font-size: 18px; font-style: italic; font-weight: bold; color: var(--light); margin-top: 5px;">
+                From spare change to major change
+            </p>
+            <div class="language-selector">
+                <span>🌐</span>
+                <select id="language-select">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="ta">Tamil</option>
+                    <option value="fr">French</option>
+                    <option value="kn">Kannada</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="questions-panel">
+            <!-- Replacing category tags with a slogan -->
+            <div class="quiz-slogan" style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 15px;">
+                Test your financial knowledge in just 2 minutes!
+            </div>
+            
+            <div class="question-container">
+                <div class="question-text" id="question-text">
+                    You earn ₹10,000 a month. How much should you ideally save for emergencies?
+                </div>
+                
+                <div class="options-container">
+                    <div class="option" data-correct="false">₹1,000</div>
+                    <div class="option" data-correct="true">₹2,000</div>
+                    <div class="option" data-correct="false">₹5,000</div>
+                    <div class="option" data-correct="false">₹500</div>
+                </div>
+            </div>
+            
+            <div class="feedback-container" id="feedback-container">
+                Saving at least 20% of your income, in this case ₹2,000, is a good practice to build an emergency fund.
+            </div>
+            
+            <div class="score-container">
+                <div class="score" id="score-counter">Score: <span id="score-value">0</span></div>
+                <button class="next-btn" id="next-btn">Next Question →</button>
+            </div>
+
+            <!-- Result container for displaying final score -->
+            <div class="result-container" id="result-container" style="text-align: center; font-size: 18px; margin-top: 20px; display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+            const translations = {
+                en: {
+                    slogan: "Test your financial knowledge in just 2 minutes!",
+                    questions: [
+                        {
+                            question: "You earn ₹10,000 a month. How much should you ideally save for emergencies?",
+                            options: ["₹1,000", "₹5,000", "₹2,000", "₹500"],
+                            correctIndex: 2,
+                            feedback: "Saving at least 20% of your income, in this case ₹2,000, is a good practice to build an emergency fund."
+                        },
+                        {
+                            question: "You need ₹15,000 for a medical emergency. What is the best option?",
+                            options: ["Take a payday loan with 30% interest", "Borrow from a friend or family member", "Use your savings", "Sell your belongings"],
+                            correctIndex: 2,
+                            feedback: "Using your savings is the best option as it avoids debt. Always prioritize building a savings fund for such emergencies."
+                        },
+                        {
+                            question: "You want to invest ₹5,000. What should you consider first?",
+                            options: [
+                                "The risk involved",
+                                "The returns promised",
+                                "The investment duration",
+                                "All of the above"
+                            ],
+                            correctIndex: 3,
+                            feedback: "Before investing, consider all factors: risk, returns, and duration. This ensures informed decisions."
+                        },
+                        {
+                            question: "You borrowed ₹10,000 from a moneylender at 5% monthly interest. How much will you repay in 6 months?",
+                            options: [
+                                "₹11,000",
+                                "₹13,000",
+                                "₹15,000",
+                                "₹16,000"
+                            ],
+                            correctIndex: 2,
+                            feedback: "At 5% monthly interest, the total repayment after 6 months is ₹15,000. Avoid high-interest loans when possible."
+                        },
+                        {
+                            question: "You want to save for a ₹50,000 course. How should you plan?",
+                            options: [
+                                "Save ₹5,000 monthly for 10 months",
+                                "Take a loan immediately",
+                                "Wait for a discount",
+                                "Ask someone to pay for you"
+                            ],
+                            correctIndex: 0,
+                            feedback: "Saving ₹5,000 monthly for 10 months is a disciplined approach to achieving your goal without debt."
+                        }
+                    ]
+                },
+                hi: {
+                    slogan: "केवल 2 मिनट में अपनी वित्तीय जानकारी का परीक्षण करें!",
+                    questions: [
+                        {
+                            question: "आप ₹10,000 प्रति माह कमाते हैं। आपात स्थिति के लिए आपको आदर्श रूप से कितना बचाना चाहिए?",
+                            options: ["₹1,000", "₹5,000", "₹2,000", "₹500"],
+                            correctIndex: 2,
+                            feedback: "अपनी आय का कम से कम 20% बचाना, इस मामले में ₹2,000, एक आपातकालीन निधि बनाने का एक अच्छा अभ्यास है।"
+                        },
+                        {
+                            question: "आपको चिकित्सा आपात स्थिति के लिए ₹15,000 की आवश्यकता है। सबसे अच्छा विकल्प क्या है?",
+                            options: ["30% ब्याज के साथ वेतन दिवस ऋण लें", "दोस्त या परिवार के सदस्य से उधार लें", "अपनी बचत का उपयोग करें", "अपनी संपत्ति बेचें"],
+                            correctIndex: 2,
+                            feedback: "अपनी बचत का उपयोग करना सबसे अच्छा विकल्प है क्योंकि यह कर्ज से बचाता है। हमेशा ऐसी आपात स्थितियों के लिए बचत निधि बनाने को प्राथमिकता दें।"
+                        },
+                        {
+                            question: "आप ₹5,000 का निवेश करना चाहते हैं। सबसे पहले आपको क्या विचार करना चाहिए?",
+                            options: [
+                                "संभावित जोखिम",
+                                "वादा किए गए रिटर्न",
+                                "निवेश की अवधि",
+                                "उपरोक्त सभी"
+                            ],
+                            correctIndex: 3,
+                            feedback: "निवेश करने से पहले, सभी कारकों पर विचार करें: जोखिम, रिटर्न और अवधि। यह सुनिश्चित करता है कि आप सूचित निर्णय लें।"
+                        },
+                        {
+                            question: "आपने एक पैसे उधार देने वाले से 5% मासिक ब्याज पर ₹10,000 उधार लिया। 6 महीनों में आप कितनी राशि चुकाएंगे?",
+                            options: [
+                                "₹11,000",
+                                "₹13,000",
+                                "₹15,000",
+                                "₹16,000"
+                            ],
+                            correctIndex: 2,
+                            feedback: "5% मासिक ब्याज पर, 6 महीनों के बाद कुल चुकौती ₹15,000 है। उच्च ब्याज वाले ऋण से बचें जब संभव हो।"
+                        },
+                        {
+                            question: "आप ₹50,000 के पाठ्यक्रम के लिए बचत करना चाहते हैं। आपको कैसे योजना बनानी चाहिए?",
+                            options: [
+                                "10 महीनों के लिए हर महीने ₹5,000 बचत करें",
+                                "तुरंत एक ऋण लें",
+                                "छूट की प्रतीक्षा करें",
+                                "किसी से आपके लिए भुगतान करने के लिए कहें"
+                            ],
+                            correctIndex: 0,
+                            feedback: "10 महीनों के लिए हर महीने ₹5,000 बचत करना एक अनुशासित दृष्टिकोण है जो आपको बिना किसी ऋण के अपने लक्ष्य को प्राप्त करने में मदद करेगा।"
+                        }
+                    ]
+                },
+                ta: {
+                    slogan: "உங்கள் நிதி அறிவை 2 நிமிடங்களில் சோதிக்கவும்!",
+                    questions: [
+                        {
+                            question: "நீங்கள் மாதம் ₹10,000 சம்பாதிக்கிறீர்கள். அவசரங்களுக்காக நீங்கள் எவ்வளவு சேமிக்க வேண்டும்?",
+                            options: ["₹1,000", "₹5,000", "₹2,000", "₹500"],
+                            correctIndex: 2,
+                            feedback: "உங்கள் வருமானத்தின் குறைந்தபட்சம் 20% சேமிப்பது, இந்த வழக்கில் ₹2,000, அவசர நிதியை உருவாக்க நல்ல நடைமுறையாகும்."
+                        },
+                        {
+                            question: "உங்களுக்கு மருத்துவ அவசரத்திற்காக ₹15,000 தேவை. சிறந்த விருப்பம் என்ன?",
+                            options: ["30% வட்டியுடன் ஒரு payday கடன் எடுக்கவும்", "நண்பர் அல்லது குடும்ப உறுப்பினரிடமிருந்து கடன் எடுக்கவும்", "உங்கள் சேமிப்பைப் பயன்படுத்தவும்", "உங்கள் சொத்துகளை விற்கவும்"],
+                            correctIndex: 2,
+                            feedback: "உங்கள் சேமிப்பைப் பயன்படுத்துவது சிறந்த விருப்பமாகும், ஏனெனில் இது கடனைத் தவிர்க்கிறது. இந்த மாதிரியான அவசரங்களுக்காக சேமிப்பு நிதியை உருவாக்க எப்போதும் முன்னுரிமை கொடுக்கவும்."
+                        },
+                        {
+                            question: "நீங்கள் ₹5,000 ஐ முதலீடு செய்ய விரும்புகிறீர்கள். முதலில் நீங்கள் என்ன கவனிக்க வேண்டும்?",
+                            options: [
+                                "இருக்கும் ஆபத்து",
+                                "வாக்குறுதி அளிக்கப்பட்ட வருமானம்",
+                                "முதலீட்டு காலம்",
+                                "மேலே உள்ள அனைத்தும்"
+                            ],
+                            correctIndex: 3,
+                            feedback: "முதலீடு செய்யும் முன், அனைத்து அம்சங்களையும் கவனிக்கவும்: ஆபத்து, வருமானம், மற்றும் காலம். இது தகவலான முடிவுகளை உறுதி செய்கிறது."
+                        },
+                        {
+                            question: "நீங்கள் 5% மாதாந்திர வட்டியில் ₹10,000 கடன் எடுத்தீர்கள். 6 மாதங்களில் நீங்கள் எவ்வளவு பணம் திருப்பி செலுத்த வேண்டும்?",
+                            options: [
+                                "₹11,000",
+                                "₹13,000",
+                                "₹15,000",
+                                "₹16,000"
+                            ],
+                            correctIndex: 2,
+                            feedback: "5% மாதாந்திர வட்டியில், 6 மாதங்களுக்கு பிறகு மொத்த திருப்பி செலுத்தல் ₹15,000 ஆகும். அதிக வட்டியுள்ள கடன்களை தவிர்க்கவும்."
+                        },
+                        {
+                            question: "₹50,000 கற்கைநெறிக்காக நீங்கள் சேமிக்க விரும்புகிறீர்கள். நீங்கள் எப்படி திட்டமிட வேண்டும்?",
+                            options: [
+                                "10 மாதங்களுக்கு மாதம் ₹5,000 சேமிக்கவும்",
+                                "உடனே கடன் எடுக்கவும்",
+                                "தள்ளுபடியை காத்திருக்கவும்",
+                                "யாரிடமாவது உங்கள் பெயரில் செலுத்த சொல்லுங்கள்"
+                            ],
+                            correctIndex: 0,
+                            feedback: "10 மாதங்களுக்கு மாதம் ₹5,000 சேமிப்பது கடனின்றி உங்கள் இலக்கை அடைய ஒரு கட்டுப்பாட்டான அணுகுமுறை ஆகும்."
+                        }
+                    ]
+                },
+                fr: {
+                    slogan: "Testez vos connaissances financières en seulement 2 minutes!",
+                    questions: [
+                        {
+                            question: "Vous gagnez ₹10,000 par mois. Combien devriez-vous idéalement économiser pour les urgences?",
+                            options: ["₹1,000", "₹5,000", "₹2,000", "₹500"],
+                            correctIndex: 2,
+                            feedback: "Économiser au moins 20% de votre revenu, dans ce cas ₹2,000, est une bonne pratique pour constituer un fonds d'urgence."
+                        },
+                        {
+                            question: "Vous avez besoin de ₹15,000 pour une urgence médicale. Quelle est la meilleure option?",
+                            options: ["Prendre un prêt sur salaire avec un intérêt de 30%", "Emprunter à un ami ou un membre de la famille", "Utiliser vos économies", "Vendre vos biens"],
+                            correctIndex: 2,
+                            feedback: "Utiliser vos économies est la meilleure option car cela évite les dettes. Priorisez toujours la constitution d'un fonds d'urgence pour de telles urgences."
+                        }
+                    ]
+                },
+                kn: {
+                    slogan: "ನಿಮ್ಮ ಹಣಕಾಸು ಜ್ಞಾನವನ್ನು ಕೇವಲ 2 ನಿಮಿಷಗಳಲ್ಲಿ ಪರೀಕ್ಷಿಸಿ!",
+                    questions: [
+                        {
+                            question: "ನೀವು ತಿಂಗಳಿಗೆ ₹10,000 ಗಳಿಸುತ್ತೀರಿ. ತುರ್ತು ಪರಿಸ್ಥಿತಿಗಳಿಗಾಗಿ ನೀವು ಎಷ್ಟು ಉಳಿಸಬೇಕು?",
+                            options: ["₹1,000", "₹5,000", "₹2,000", "₹500"],
+                            correctIndex: 2,
+                            feedback: "ನಿಮ್ಮ ಆದಾಯದ ಕನಿಷ್ಠ 20% ಉಳಿಸುವುದು, ಈ ಪ್ರಕರಣದಲ್ಲಿ ₹2,000, ತುರ್ತು ನಿಧಿಯನ್ನು ನಿರ್ಮಿಸಲು ಉತ್ತಮ ಅಭ್ಯಾಸವಾಗಿದೆ."
+                        },
+                        {
+                            question: "ನೀವು ವೈದ್ಯಕೀಯ ತುರ್ತು ಪರಿಸ್ಥಿತಿಗಾಗಿ ₹15,000 ಅಗತ್ಯವಿದೆ. ಉತ್ತಮ ಆಯ್ಕೆ ಯಾವುದು?",
+                            options: ["30% ಬಡ್ಡಿಯೊಂದಿಗೆ payday ಸಾಲವನ್ನು ತೆಗೆದುಕೊಳ್ಳಿ", "ಮಿತ್ರ ಅಥವಾ ಕುಟುಂಬ ಸದಸ್ಯರಿಂದ ಸಾಲವನ್ನು ತೆಗೆದುಕೊಳ್ಳಿ", "ನಿಮ್ಮ ಉಳಿತಾಯವನ್ನು ಬಳಸಿರಿ", "ನಿಮ್ಮ ಆಸ್ತಿಗಳನ್ನು ಮಾರಾಟ ಮಾಡಿ"],
+                            correctIndex: 2,
+                            feedback: "ನಿಮ್ಮ ಉಳಿತಾಯವನ್ನು ಬಳಸುವುದು ಉತ್ತಮ ಆಯ್ಕೆಯಾಗಿದೆ ಏಕೆಂದರೆ ಇದು ಸಾಲವನ್ನು ತಪ್ಪಿಸುತ್ತದೆ. ಇಂತಹ ತುರ್ತು ಪರಿಸ್ಥಿತಿಗಳಿಗೆ ಉಳಿತಾಯ ನಿಧಿಯನ್ನು ನಿರ್ಮಿಸಲು ಪ್ರಾಮುಖ್ಯತೆ ನೀಡಿರಿ."
+                        }
+                    ]
+                }
+            };
+
+            const languageSelect = document.getElementById("language-select");
+            const nextButton = document.getElementById("next-btn");
+            let currentQuestionIndex = 0;
+            let score = 0;
+
+            function loadQuestion(lang, index) {
+                const questionData = translations[lang].questions[index];
+                document.getElementById("question-text").innerText = questionData.question;
+
+                const optionsContainer = document.querySelector(".options-container");
+                optionsContainer.innerHTML = "";
+
+                questionData.options.forEach((option, idx) => {
+                    const optionElement = document.createElement("div");
+                    optionElement.className = "option";
+                    optionElement.innerText = option;
+                    optionElement.onclick = () => {
+                        const isCorrect = idx === questionData.correctIndex;
+                        optionElement.classList.add(isCorrect ? "correct" : "incorrect");
+
+                        const feedbackMessage = isCorrect
+                            ? `Correct! ${questionData.feedback}`
+                            : `Incorrect. The correct answer is: ${questionData.options[questionData.correctIndex]}. ${questionData.feedback}`;
+                        document.getElementById("feedback-container").innerText = feedbackMessage;
+                        document.getElementById("feedback-container").style.display = "block";
+
+                        if (isCorrect) {
+                            score++;
+                            document.getElementById("score-value").innerText = score;
+                        }
+
+                        // Disable further clicks on options after selection
+                        Array.from(optionsContainer.children).forEach(child => {
+                            child.onclick = null;
+                        });
+                    };
+                    optionsContainer.appendChild(optionElement);
+                });
+
+                // Update slogan
+                document.querySelector(".quiz-slogan").innerText = translations[lang].slogan;
+
+                // Hide feedback container for the new question
+                document.getElementById("feedback-container").style.display = "none";
+            }
+
+            // Shuffle questions for randomization
+            function shuffleQuestions(questions) {
+                for (let i = questions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [questions[i], questions[j]] = [questions[j], questions[i]];
+                }
+            }
+
+            nextButton.addEventListener("click", () => {
+                const selectedLanguage = languageSelect.value;
+                const questions = translations[selectedLanguage].questions;
+
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    loadQuestion(selectedLanguage, currentQuestionIndex);
+                } else {
+                    const resultMessage = score >= 3 
+                        ? `Good job! 😊 Your total score is ${score}.`
+                        : `Not bad, keep revising! 😞 Your total score is ${score}.`;
+                    
+                    const resultContainer = document.getElementById("result-container");
+                    resultContainer.innerText = resultMessage;
+                    resultContainer.style.display = "block";
+
+                    // Disable the Next Question button
+                    nextButton.disabled = true;
+                    nextButton.style.cursor = "not-allowed";
+                    nextButton.style.opacity = "0.6";
+                }
+            });
+
+            // Initialize with default language and shuffle questions
+            const selectedLanguage = "en";
+            shuffleQuestions(translations[selectedLanguage].questions);
+            loadQuestion(selectedLanguage, 0);
+        </script>
+</body>
+</html>
